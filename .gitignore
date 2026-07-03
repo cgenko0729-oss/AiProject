@@ -108,3 +108,7 @@ InitTestScene*.unity*
 # Test results
 /TestResults/
 /CodeCoverage/
+
+# Core compile check tool output
+tools/corecheck/bin/
+tools/corecheck/obj/
