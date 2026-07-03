@@ -1,0 +1,498 @@
+# PROMPT_FOR_CLAUDE_CODE.md — KISS Prompts for Unity Fixed-Seed 3D Dungeon
+
+Use these prompts in Claude Code one by one.
+
+Do not ask Claude to make the whole project at once.
+
+---
+
+## Phase 0 — First Prompt: Read and Plan Only
+
+```text
+You are my Unity C# coding assistant.
+
+Before editing files, read:
+
+- SPEC.md
+- SKILL.md
+
+Project:
+A small 3D dungeon battle game like the dungeon battle part of 風来之国 as a loose visual reference.
+
+Important:
+This is not a real-time action game.
+It is still a fixed-seed turn-based grid roguelike.
+
+Main rule:
+Same Seed + same Command sequence = exactly same replay and result.
+
+Design rule:
+Use KISS principle.
+Do not make code complicated.
+Do not separate into too many classes.
+Use simple English class, function, and variable names.
+Use simple Japanese comments in code.
+
+Hard Core rules:
+1. Game.Core must be plain C#.
+2. Game.Core must not use UnityEngine.
+3. Game.Core must not use MonoBehaviour.
+4. Game.Core must not use GameObject, Transform, Vector2, Vector2Int, Vector3.
+5. Game.Core must not use Time or Time.deltaTime.
+6. Game.Core must not use Rigidbody or Collider.
+7. Game.Core must not use UnityEngine.Random, Random.Range, or Random.value.
+8. Randomness must use explicit Seed, such as System.Random(seed).
+9. Gameplay must advance only through RogueGame.Step(Command command).
+10. Movement and battle must use integer GridPos.
+11. Tests must be Edit Mode tests with real Assert.
+
+Recommended simple class list:
+- GameConfig
+- GridPos
+- GameMap
+- GameUnit
+- GameState
+- Replay
+- RogueGame
+- RogueGameView
+- RogueGameTests
+
+First, inspect the current Unity project and output only:
+- current project structure summary
+- simple folder structure plan
+- asmdef plan
+- simple class plan
+- test plan
+- implementation phases
+
+Do not edit files yet.
+```
+
+---
+
+## Phase 1 — Create Simple Folder and asmdef Structure
+
+```text
+Now implement Phase 1 only.
+
+Create this simple structure:
+
+Assets/Scripts/Game.Core/
+  Game.Core.asmdef
+
+Assets/Scripts/Game.Presentation/
+  Game.Presentation.asmdef
+
+Assets/Tests/EditMode/Game.Core.Tests/
+  Game.Core.Tests.asmdef
+
+Rules:
+- Game.Core must be pure C# and must not reference UnityEngine.
+- Game.Presentation can use UnityEngine and must reference Game.Core.
+- Game.Core.Tests must reference Game.Core and NUnit.
+- Do not create gameplay code yet.
+- Do not create many folders.
+- Keep it simple.
+
+After editing, report:
+Changed files:
+asmdef setup:
+Manual Unity Inspector steps if needed:
+Constraint check:
+Next step:
+```
+
+---
+
+## Phase 2 — Create Core Skeleton with Few Classes
+
+```text
+Now implement Phase 2 only.
+
+Create simple Game.Core skeleton files:
+
+- GameConfig.cs
+- GridPos.cs
+- GameMap.cs
+- GameUnit.cs
+- GameState.cs
+- Replay.cs
+- RogueGame.cs
+
+Rules:
+- No using UnityEngine.
+- No MonoBehaviour.
+- No Unity types.
+- No Time.
+- No physics.
+- No Unity random.
+- Use simple English names.
+- Use simple Japanese comments.
+- Do not over-engineer.
+- Do not add interfaces unless necessary.
+- Do not create many small classes.
+
+Required concepts:
+- enum TileType
+- enum Command
+- enum GameResult
+- GameConfig stores all numbers.
+- GridPos stores integer X/Y.
+- GameUnit can represent both player and enemy.
+- RogueGame exposes:
+  - RogueGame(int seed, GameConfig config)
+  - GameState State
+  - GameState Step(Command command)
+  - string GetReplayText()
+  - bool IsEnd
+
+Do not implement Unity Presentation yet.
+
+After editing, report:
+Changed files:
+Core API summary:
+Constraint check:
+Next step:
+```
+
+---
+
+## Phase 3 — Write Simple Edit Mode Tests First
+
+```text
+Now implement Phase 3 only.
+
+Create one test file:
+
+Assets/Tests/EditMode/Game.Core.Tests/RogueGameTests.cs
+
+Write these tests:
+
+1. SameSeedAndSameCommands_ShouldCreateSameReplay
+2. SameSeedAndDifferentCommands_ShouldCreateDifferentReplay
+3. PlayerCannotMoveIntoWall
+4. PlayerAttackEnemy_ShouldReduceEnemyHp
+5. EnemyAttackPlayer_ShouldReducePlayerHp
+6. Goal_ShouldWin
+7. MaxTurn_ShouldDraw
+
+Rules:
+- Use NUnit [Test].
+- Do not use [UnityTest].
+- Do not wait for frames.
+- Do not create GameObject.
+- Do not rely on scene.
+- Every test must have meaningful Assert.
+- Tests should directly instantiate Game.Core classes.
+- It is okay if tests fail at first because Core is not fully implemented.
+
+Use simple test helper methods only if they make the tests easier to understand.
+
+After editing, report:
+Changed files:
+Tests created:
+Expected failing tests:
+How to run tests in Unity:
+Next step:
+```
+
+---
+
+## Phase 4 — Implement Core Logic to Pass Tests
+
+```text
+Now implement Phase 4 only.
+
+Implement simple Core logic in the existing few classes.
+
+Required behavior:
+- Create map from Seed.
+- Use System.Random(seed).
+- Outer border walls.
+- Player starts at (1, 1).
+- Goal is at (width - 2, height - 2).
+- Inner walls are generated by seed.
+- Enemy positions are generated by seed.
+- Player can move one grid cell per Step.
+- Player cannot move into wall.
+- If player steps toward enemy, player attacks enemy.
+- Enemy acts in ID order.
+- If enemy is next to player, enemy attacks.
+- Otherwise enemy moves one cell toward player.
+- Check Win, Lose, Draw.
+- Record replay with stable text.
+
+Keep AI simple:
+- no A*
+- no complex pathfinding
+- no behavior tree
+- no strategy pattern
+
+Rules:
+- No using UnityEngine in Game.Core.
+- No MonoBehaviour in Game.Core.
+- No Unity types in Game.Core.
+- No Time.deltaTime.
+- No Rigidbody or Collider.
+- No UnityEngine.Random.
+- No magic numbers in logic when possible; use GameConfig.
+- Do not split into many classes.
+- Use simple English names and simple Japanese comments.
+
+After editing:
+- explain how to run tests
+- fix compile errors
+- fix failing tests without weakening the tests
+
+Report:
+Changed files:
+Implemented behavior:
+Test result:
+Constraint check:
+Remaining risks:
+Next step:
+```
+
+---
+
+## Phase 5 — Create Simple 3D Dungeon Presentation
+
+```text
+Now implement Phase 5 only.
+
+Create a simple Unity Presentation class:
+
+Assets/Scripts/Game.Presentation/RogueGameView.cs
+
+Goal:
+Make the project playable as a simple 3D dungeon.
+
+Visual direction:
+- simple 3D dungeon
+- floor cubes or planes
+- wall cubes
+- player capsule
+- enemy capsules
+- goal cube
+- clear and readable, not beautiful
+
+Controls:
+- W = Command.Up
+- S = Command.Down
+- A = Command.Left
+- D = Command.Right
+- Space = Command.Wait
+
+Rules:
+- Presentation can use MonoBehaviour and UnityEngine.
+- Presentation creates RogueGame.
+- Presentation reads input.
+- Presentation calls RogueGame.Step(command).
+- Presentation updates object positions from GameState.
+- Presentation may use Debug.Log to show result.
+- Presentation must not decide damage, enemy AI, map generation, win, or lose.
+- Presentation must not use Unity physics as gameplay authority.
+- Keep one MonoBehaviour if possible.
+- Keep code simple and understandable.
+- Use simple Japanese comments.
+
+After editing, report:
+Changed files:
+How to set up scene:
+How to play:
+Constraint check:
+Next step:
+```
+
+---
+
+## Phase 6 — Constraint Check and Simplify
+
+```text
+Now implement Phase 6 only.
+
+Review the whole project.
+
+Check Game.Core for forbidden usage:
+- using UnityEngine
+- MonoBehaviour
+- GameObject
+- Transform
+- Vector2 / Vector2Int / Vector3
+- Time / Time.deltaTime
+- Rigidbody / Collider
+- UnityEngine.Random
+- Random.Range
+- Random.value
+
+Also check:
+- Is code too complicated?
+- Are there too many classes?
+- Are names simple English?
+- Are numbers mostly in GameConfig?
+- Does replay use stable enemy ID order?
+- Do tests have real Assert?
+- Does Presentation contain gameplay rules?
+
+If there are problems:
+- list them
+- fix them
+- keep the fix simple
+
+After editing, report:
+Violations found:
+Violations fixed:
+Simplifications made:
+Remaining concerns:
+```
+
+---
+
+## Phase 7 — Final Review for Submission
+
+```text
+Now do final review only.
+Do not add new features.
+
+Check the project against this final checklist:
+
+1. It is a small 3D dungeon battle game.
+2. It is turn-based and grid-based.
+3. WASD only sends Command to Core.
+4. Same Seed + same Command sequence gives same replay.
+5. Game.Core has no UnityEngine.
+6. Game.Core has no MonoBehaviour.
+7. Game.Core has no Time.deltaTime.
+8. Game.Core has no Rigidbody / Collider.
+9. Game.Core has no UnityEngine.Random.
+10. Gameplay progresses only through RogueGame.Step(Command command).
+11. Battle is decided by GridPos integer logic.
+12. Tests are Edit Mode tests.
+13. Tests have real Assert.
+14. Code follows KISS.
+15. Class count is small.
+16. Function and variable names are simple English.
+17. Comments are simple Japanese.
+
+Output:
+- final file structure
+- test list
+- how to run tests
+- how to play in Unity
+- known limitations
+- final checklist table
+```
+
+---
+
+# Repair Prompts
+
+Use these if Claude Code makes mistakes.
+
+---
+
+## Repair 1 — Code Too Complicated
+
+```text
+The code is too complicated for this homework.
+
+Please simplify it.
+
+Rules:
+- Use fewer classes.
+- Avoid interfaces unless truly needed.
+- Avoid design patterns.
+- Use simple English names.
+- Keep only:
+  GameConfig, GridPos, GameMap, GameUnit, GameState, Replay, RogueGame, RogueGameView, RogueGameTests.
+- Follow KISS.
+```
+
+---
+
+## Repair 2 — UnityEngine in Core
+
+```text
+You used UnityEngine or Unity types inside Game.Core.
+This violates the homework.
+
+Fix:
+- remove using UnityEngine
+- remove GameObject / Transform / Vector2 / Vector2Int / Vector3
+- use GridPos instead
+- keep Core pure C#
+```
+
+---
+
+## Repair 3 — Unity Random in Core
+
+```text
+You used UnityEngine.Random, Random.Range, or Random.value in Game.Core.
+This violates deterministic Seed rules.
+
+Fix:
+- use System.Random(seed)
+- pass Seed through RogueGame constructor
+- make map and enemy placement deterministic
+```
+
+---
+
+## Repair 4 — Time or Frame-Based Logic
+
+```text
+You used Time.deltaTime or frame-based progression for gameplay.
+This violates the turn-based deterministic rule.
+
+Fix:
+- remove frame-based Core progression
+- game should advance only when RogueGame.Step(Command command) is called
+- Update may only read WASD and send one command per key press
+```
+
+---
+
+## Repair 5 — Physics-Based Battle
+
+```text
+You used Rigidbody, Collider, OnTriggerEnter, or OnCollisionEnter to decide gameplay.
+This violates the homework.
+
+Fix:
+- use GridPos integer comparison in Game.Core
+- Unity objects are visual only
+- battle and win/lose must be decided by Core
+```
+
+---
+
+## Repair 6 — Weak Tests
+
+```text
+The tests are weak.
+
+Fix:
+- add real Assert
+- compare replay text
+- check player position
+- check enemy HP
+- check player HP
+- check game result
+- check turn count
+```
+
+---
+
+## Repair 7 — Presentation Contains Gameplay Rules
+
+```text
+Presentation contains gameplay logic.
+
+Fix:
+- move damage, enemy movement, map generation, win/lose to Game.Core
+- Presentation should only:
+  read input
+  call RogueGame.Step(command)
+  render GameState
+```
