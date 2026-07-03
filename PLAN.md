@@ -9,7 +9,7 @@
 - [x] Phase 1 — Folders + asmdef (Game.Core / Game.Presentation / Game.Core.Tests)
 - [x] Phase 2 — Core skeleton (8 files: 7 classes + GameEnums, compiles clean via tools/corecheck)
 - [x] Phase 3 — Edit Mode tests first (7 tests, confirmed red via dotnet test)
-- [ ] Phase 4 — Core implementation until all tests green
+- [x] Phase 4 — Core implementation (7/7 tests green via dotnet test)
 - [ ] Phase 5 — 3D Presentation (RogueGameView, WASD + Space)
 - [ ] Phase 6 — Constraint check + simplify
 - [ ] Phase 7 — Final review + submission checklist
