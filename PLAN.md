@@ -10,7 +10,7 @@
 - [x] Phase 2 — Core skeleton (8 files: 7 classes + GameEnums, compiles clean via tools/corecheck)
 - [x] Phase 3 — Edit Mode tests first (7 tests, confirmed red via dotnet test)
 - [x] Phase 4 — Core implementation (7/7 tests green via dotnet test)
-- [ ] Phase 5 — 3D Presentation (RogueGameView, WASD + Space)
+- [x] Phase 5 — 3D Presentation (RogueGameView, new Input System, compile verified)
 - [ ] Phase 6 — Constraint check + simplify
 - [ ] Phase 7 — Final review + submission checklist
 
