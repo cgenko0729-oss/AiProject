@@ -112,3 +112,5 @@ InitTestScene*.unity*
 # Core compile check tool output
 tools/corecheck/bin/
 tools/corecheck/obj/
+tools/testcheck/bin/
+tools/testcheck/obj/
