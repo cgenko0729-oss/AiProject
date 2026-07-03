@@ -114,3 +114,6 @@ tools/corecheck/bin/
 tools/corecheck/obj/
 tools/testcheck/bin/
 tools/testcheck/obj/
+
+# Keep our tool csproj files (Unity rule above ignores *.csproj)
+!tools/**/*.csproj
