@@ -16,17 +16,15 @@ namespace Game.Core.Tests
         /// <param name="width">マップの幅</param>
         /// <param name="height">マップの高さ</param>
         /// <param name="enemy_count">敵の数</param>
-        /// <param name="wall_percent">内壁の確率</param>
         /// <param name="max_turn">最大ターン数</param>
         /// <returns>テスト用 GameConfig</returns>
-        private static GameConfig _MakeConfig(int width = 10, int height = 10, int enemy_count = 3, int wall_percent = 15, int max_turn = 100)
+        private static GameConfig _MakeConfig(int width = 20, int height = 20, int enemy_count = 3, int max_turn = 100)
         {
             return new GameConfig
             {
                 width = width,
                 height = height,
                 enemy_count = enemy_count,
-                wall_percent = wall_percent,
                 max_turn = max_turn
             };
         }
@@ -42,6 +40,25 @@ namespace Game.Core.Tests
             {
                 game.Step(command);
             }
+        }
+
+        /// <summary>
+        /// マップからゴールの座標を探す
+        /// </summary>
+        /// <param name="map">対象マップ</param>
+        /// <returns>ゴール座標</returns>
+        private static GridPos _FindGoal(GameMap map)
+        {
+            for (int x = 0; x < map.width; x++)
+            {
+                for (int y = 0; y < map.height; y++)
+                {
+                    var pos = new GridPos(x, y);
+                    if (map.IsGoal(pos)) return pos;
+                }
+            }
+            Assert.Fail("マップにゴールが無い");
+            return default;
         }
 
         [Test]
@@ -75,24 +92,30 @@ namespace Game.Core.Tests
         [Test]
         public void PlayerCannotMoveIntoWall()
         {
-            // プレイヤーは (1,1) 開始。左の (0,1) は必ず外周の壁
-            var game = new RogueGame(1, _MakeConfig(enemy_count: 0));
+            // 左へ歩き続ければ必ずどこかの壁で止まる（BSP マップでも成立する）
+            var config = _MakeConfig(width: 12, height: 12, enemy_count: 0);
+            var game = new RogueGame(1, config);
+            for (int i = 0; i < config.width; i++)
+            {
+                game.Step(Command.Left);
+            }
+
             GridPos before = game.state.player.pos;
+            Assert.IsTrue(game.state.map.IsWall(before.Next(Command.Left)), "左隣が壁になっていない");
 
             game.Step(Command.Left);
 
             Assert.AreEqual(before, game.state.player.pos, "壁に向かって移動したのに位置が変わった");
-            Assert.IsTrue(game.state.map.IsWall(new GridPos(0, 1)), "外周が壁になっていない");
         }
 
         [Test]
         public void PlayerAttackEnemy_ShouldReduceEnemyHp()
         {
             // 敵をプレイヤーの右隣に置いて、右へ進む → 攻撃になる
-            var config = _MakeConfig(enemy_count: 1, wall_percent: 0);
+            var config = _MakeConfig(enemy_count: 1);
             var game = new RogueGame(1, config);
             GameUnit enemy = game.state.enemies[0];
-            enemy.pos = new GridPos(2, 1);
+            enemy.pos = game.state.player.pos.Next(Command.Right);
             int hp_before = enemy.hp;
             GridPos player_before = game.state.player.pos;
 
@@ -106,9 +129,9 @@ namespace Game.Core.Tests
         public void EnemyAttackPlayer_ShouldReducePlayerHp()
         {
             // 敵をプレイヤーの隣に置いて待機 → 敵の攻撃を受ける
-            var config = _MakeConfig(enemy_count: 1, wall_percent: 0);
+            var config = _MakeConfig(enemy_count: 1);
             var game = new RogueGame(1, config);
-            game.state.enemies[0].pos = new GridPos(2, 1);
+            game.state.enemies[0].pos = game.state.player.pos.Next(Command.Right);
             int hp_before = game.state.player.hp;
 
             game.Step(Command.Wait);
@@ -119,11 +142,21 @@ namespace Game.Core.Tests
         [Test]
         public void Goal_ShouldWin()
         {
-            // 4x4 の壁なし・敵なしマップ。(1,1) → (2,1) → ゴール (2,2)
-            var game = new RogueGame(1, _MakeConfig(width: 4, height: 4, enemy_count: 0, wall_percent: 0));
+            // 6x6 は分割されず部屋が1つだけになるので、ゴールへまっすぐ歩ける
+            var game = new RogueGame(1, _MakeConfig(width: 6, height: 6, enemy_count: 0));
+            GridPos goal = _FindGoal(game.state.map);
 
-            game.Step(Command.Right);
-            game.Step(Command.Up);
+            // ゴールへ向かって1マスずつ歩く（安全のため上限あり）
+            int safety = 100;
+            while (!game.isEnd && safety-- > 0)
+            {
+                GridPos pos = game.state.player.pos;
+                if (pos.x < goal.x) game.Step(Command.Right);
+                else if (pos.x > goal.x) game.Step(Command.Left);
+                else if (pos.y < goal.y) game.Step(Command.Up);
+                else if (pos.y > goal.y) game.Step(Command.Down);
+                else break;
+            }
 
             Assert.AreEqual(GameResult.Win, game.state.result);
             Assert.IsTrue(game.isEnd);
