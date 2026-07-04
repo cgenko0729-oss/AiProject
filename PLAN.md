@@ -11,8 +11,8 @@
 - [x] Phase 3 — Edit Mode tests first (7 tests, confirmed red via dotnet test)
 - [x] Phase 4 — Core implementation (7/7 tests green via dotnet test)
 - [x] Phase 5 — 3D Presentation (RogueGameView, new Input System, compile verified)
-- [ ] Phase 6 — Constraint check + simplify
-- [ ] Phase 7 — Final review + submission checklist
+- [x] Phase 6 — Constraint check (all mechanical gates PASS, metas committed, scene set up)
+- [x] Phase 7 — Final review (FINAL_REVIEW.md, all checklist items green)
 
 ## Branch strategy
 
