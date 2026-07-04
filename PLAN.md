@@ -60,3 +60,8 @@ Tests:              RogueGameTests (7 tests)
 - Coverage: CONFIRMED (2026-07-04) — deferred. 7 required tests green is the gate.
 - Empty legacy folders `Assets/Scripts/{Player,Map,Enemy}` will be removed in Phase 1.
 - `TestResults/` and `CodeCoverage/` must be git-ignored.
+- 2026-07-04 (post-submission request): map generation replaced with BSP dungeon
+  (rooms + L corridors, 40x24 default) per user request, styled after
+  `Assets/ScreenShotForAi/GameDungeonImagePhoto.png`. Player spawns in first room,
+  goal in farthest room. Tests updated to be spawn-position independent
+  (same 7 tests, asserts kept strong).

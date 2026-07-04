@@ -75,12 +75,19 @@ public sealed class RogueGame
 7. Return state.
 ```
 
-## Map generation (KISS)
+## Map generation (BSP dungeon)
 
 ```text
-1. Fill Floor.  2. Outer border Wall.  3. Player at (1,1).
-4. Goal at (width-2, height-2).  5. Inner walls by random percent.
-6. Never wall on spawn/goal.  7. Enemies on walkable cells, same random source.
+1. Fill everything with Wall (carve out of solid rock).
+2. Recursively split space (BSP): split the longer axis at a random cut,
+   stop when area < min_area_size * 2. Fixed recursion order = deterministic.
+3. Carve one random-sized room per leaf (>= min_room_size, 1-tile margin kept).
+4. Connect consecutive rooms with L-shaped corridors (horizontal then vertical)
+   -> chain guarantees full connectivity.
+5. Player spawns at first room's center.
+6. Goal = center of the room farthest (manhattan) from spawn
+   (single-room map: room corner; throws if too small).
+7. Enemies on random walkable cells, same single random source.
 ```
 
 ## Replay line format (stable, always identical layout)

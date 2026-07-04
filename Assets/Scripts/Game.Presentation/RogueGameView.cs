@@ -87,8 +87,11 @@ namespace Game.Presentation
                     var pos = new GridPos(x, y);
                     if (map.IsWall(pos))
                     {
-                        // 壁 = 灰色キューブ
-                        _CreateCube("Wall", pos, 0.5f, new Vector3(1f, 1f, 1f), Color.gray);
+                        // 床に接する壁だけキューブにする（岩盤の内部は描かない）
+                        if (_HasFloorNeighbor(map, pos))
+                        {
+                            _CreateCube("Wall", pos, 0.5f, new Vector3(1f, 1f, 1f), Color.gray);
+                        }
                     }
                     else
                     {
@@ -158,6 +161,25 @@ namespace Game.Presentation
             float size = Mathf.Max(map.width, map.height);
             camera.transform.position = new Vector3(cx, size * 1.1f, cz - size * 0.6f);
             camera.transform.LookAt(new Vector3(cx, 0f, cz));
+        }
+
+        /// <summary>
+        /// 周囲8マスに床（歩けるマス）があるかを返す。壁の描画間引きに使う
+        /// </summary>
+        /// <param name="map">対象マップ</param>
+        /// <param name="pos">調べる壁の座標</param>
+        /// <returns>床に接していれば true</returns>
+        private static bool _HasFloorNeighbor(GameMap map, GridPos pos)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dx == 0 && dy == 0) continue;
+                    if (map.IsWalkable(new GridPos(pos.x + dx, pos.y + dy))) return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
